@@ -1,0 +1,38 @@
+{
+  "name": "Video Conference",
+  "version": "1.0.0",
+  "description": "Video Conference",
+  "private": true,
+  "dependencies": {
+    "attachmediastream": "^2.0.4",
+    "axios": "^0.18.0",
+    "baucis": "^1.6.8",
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.4",
+    "express": "^4.16.3",
+    "freeice": "^2.2.2",
+    "jsonwebtoken": "^8.3.0",
+    "mongoose": "^5.2.18",
+    "morgan": "^1.9.1"
+  },
+  "scripts": {
+    "build-css": "node-sass-chokidar src/ -o src/",
+    "watch-css": "npm run build-css && node-sass-chokidar src/ -o src/ --watch --recursive",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "server": "nodemon --watch public app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seoksanghwan/videosConf---server"
+  },
+  "author": "seoksanghwan",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^1.18.4"
+  },
+  "bugs": {
+    "url": "https://github.com/seoksanghwan/videosConf---server"
+  }
+}
