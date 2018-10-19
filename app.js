@@ -110,7 +110,7 @@ app.use('/api', require('./routes/api'))
 
 // open the server
 app.listen(port, () => {
-  console.log(`Express is running on port ${port}`)
+  console.log('Server running at http://127.0.0.1:' + port + '/');
 })
 
 /* =======================
