@@ -8,6 +8,7 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const Room = require('./model/RoomList');
+const socketIo = require("socket.io");
 /* =======================
     LOAD THE CONFIG
 ==========================*/
@@ -56,7 +57,6 @@ router.route('/rooms').post((req, res) => {
     userName,
     userMail
   });
-
   newRoom.save((err, roomsData) => {
     if (err) {
       res.status(500).json({
@@ -67,32 +67,6 @@ router.route('/rooms').post((req, res) => {
     }
   });
 });
-
-router.route('/update').post((req, res) => {
-  let {
-    title,
-    userName,
-    userMail
-  } = req.body;
-  Room.findOne({ 'userMail': userMail }, function (err, user) {
-    if (err) {
-      console.log(err);
-      res.status(500).send('update error');
-      return;
-    }
-    user.title = title;
-    user.userName = userName;
-    user.save(function (err, silence) {
-      if (err) {
-        console.log(err);
-        res.status(500).send('update error');
-        return;
-      }
-      res.status(200).send("Updated");
-    });
-  });
-});
-
 
 app.delete('/rooms/:id', function (req, res) {
   const { id } = req.body;
@@ -109,7 +83,7 @@ app.delete('/rooms/:id', function (req, res) {
 app.use('/api', require('./routes/api'))
 
 // open the server
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log('Server running at http://127.0.0.1:' + port + '/');
 })
 
@@ -122,3 +96,16 @@ db.on('error', console.error)
 db.once('open', () => {
   console.log('connected to mongodb server')
 })
+
+const io = socketIo(server);
+io.on('connection', (socket) => {
+  console.log('a user connected');
+
+  socket.on('new:message', function (msgObject) {
+    io.emit('new:message', msgObject);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
+});

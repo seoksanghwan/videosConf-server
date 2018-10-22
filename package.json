@@ -12,7 +12,8 @@
     "freeice": "^2.2.2",
     "jsonwebtoken": "^8.3.0",
     "mongoose": "^5.2.18",
-    "morgan": "^1.9.1"
+    "morgan": "^1.9.1",
+    "socket.io": "^2.1.1"
   },
   "scripts": {
     "dev": "SET NODE_ENV=development DB_PASSWORD=admin5678 && nodemon ./bin/www",
