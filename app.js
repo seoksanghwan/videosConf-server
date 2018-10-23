@@ -1,7 +1,7 @@
-/* =======================
-    LOAD THE DEPENDENCIES
-==========================*/
 const express = require('express');
+const https = require('https');
+const http = require('http');
+const fs = require('fs');
 const router = express.Router();
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
@@ -9,103 +9,94 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const Room = require('./model/RoomList');
 const socketIo = require("socket.io");
-/* =======================
-    LOAD THE CONFIG
-==========================*/
 const config = require('./config')
 const port = process.env.PORT || 8000
-
-/* =======================
-    EXPRESS CONFIGURATION
-==========================*/
 const app = express()
-
-// parse JSON and url-encoded query
+const options = {
+  key: fs.readFileSync('./key/file.pem'),
+  cert: fs.readFileSync('./key/file.crt')
+};
+const port1 = process.env.PORT || 8000;
+const port2 = process.env.PORT || 8080;
+//
+app.use(express.urlencoded());
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(cors());
-
-// print the request log on console
 app.use(morgan('dev'))
 app.use('/', router);
 app.set('json spaces', 2);
-// set the secret key variable for jwt
 app.set('jwt-secret', config.secret)
 
-// index page, just for testing
-router.get('/', (req, res) => {
-  Room.find((err, data) => {
-    if (err) {
-      res.status(500).json({
-        message: 'Error'
-      })
-    } else {
-      res.json(data)
-    }
-  });
-});
-
-router.route('/rooms').post((req, res) => {
-  let {
-    title,
-    userName,
-    userMail
-  } = req.body;
-
-  const newRoom = new Room({
-    title,
-    userName,
-    userMail
-  });
-  newRoom.save((err, roomsData) => {
-    if (err) {
-      res.status(500).json({
-        message: 'error'
-      })
-    } else {
-      res.json({ message: "success" });
-    }
-  });
-});
-
-app.delete('/rooms/:id', function (req, res) {
-  const { id } = req.body;
-  Room.findOneAndDelete({ _id: id }, function (err) {
-    if (err) {
-      res.send(err);
-    } else {
-      res.json({ message: 'Offer Deleted!' })
-    }
-  })
-});
-
-// configure api router
 app.use('/api', require('./routes/api'))
 
-// open the server
-const server = app.listen(port, () => {
-  console.log('Server running at http://127.0.0.1:' + port + '/');
-})
+var server = https.createServer(options, app).listen(port2, function(){  
+  console.log("Https server listening on port " + port2);
+});
 
-/* =======================
-    CONNECT TO MONGODB SERVER
-==========================*/
-mongoose.connect(config.mongodbUri)
-const db = mongoose.connection
-db.on('error', console.error)
-db.once('open', () => {
-  console.log('connected to mongodb server')
-})
+app.get('/', function (req, res) {  
+  res.writeHead(200, {'Content-Type' : 'text/html'});
+  res.write('<h3>Welcome</h3>');
+  res.write('<a href="/login">Please login</a>');
+  res.end();
+});
 
 const io = socketIo(server);
-io.on('connection', (socket) => {
-  console.log('a user connected');
+io.of('/').on('connection', (socket) => {
+  console.log({'a user connected' : socket.id});
+  var room = Room.find((err, data) => {
+    if (err) {
+      console.log("---Gethyl GET failed!!")
+    } else {
+      socket.emit('initialList', data);
+      console.log("데이터를 가져왔습니다.")
+    }
+  });
 
-  socket.on('new:message', function (msgObject) {
-    io.emit('new:message', msgObject);
+  socket.on('addItem', (addData) => {
+    let {
+      title,
+      userName,
+      userMail
+    } = addData;
+    const newRoom = new Room({
+      title,
+      userName,
+      userMail
+    });
+    newRoom.save((err, roomsData) => {
+      if (err) {
+        console.log("---Gethyl ADD NEW ITEM failed!! " + err)
+      } else {
+        io.emit('itemAdded', roomsData)
+        console.log({ message: "+++Gethyl ADD NEW ITEM Added!" })
+      }
+    });
+  })
+
+  socket.on('removeItem', (id) => {
+    Room.findOneAndDelete({ _id: id }, function (err) {
+      if (err) {
+        console.log("---Gethyl ADD NEW ITEM failed!! " + err)
+      } else {
+        io.emit('itemRemove', id);
+        console.log({ message: "+++Gethyl ADD NEW ITEM Removed!!" })
+      }
+    })
   });
 
   socket.on('disconnect', () => {
-    console.log('user disconnected');
+    console.log("나감요." + socket.id)
+    io.emit('user disconnected');
   });
 });
+
+mongoose.connect(
+  config.mongodbUri,
+  { useNewUrlParser: true }
+);
+mongoose.set("useCreateIndex", true);
+const db = mongoose.connection;
+db.once('open', () => {
+  console.log('DB Connected...');
+})
