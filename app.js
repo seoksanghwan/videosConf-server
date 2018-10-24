@@ -27,7 +27,7 @@ app.set('json spaces', 2);
 app.set('jwt-secret', config.secret)
 app.use('/api', require('./routes/api'))
 
-app.listen(port, function(){  
+const server = app.listen(port, function(){  
   console.log("Https server listening on port " + port);
 });
 
@@ -38,8 +38,8 @@ app.get('/', function (req, res) {
   res.end();
 });
 
-//const io = socketIo(server);
-/*io.on('connection', (socket) => {
+const io = socketIo(server);
+io.on('connection', (socket) => {
   console.log({'a user connected' : socket.id});
   var room = Room.find((err, data) => {
     if (err) {
@@ -86,9 +86,9 @@ app.get('/', function (req, res) {
     console.log("나감요." + socket.id)
     io.emit('user disconnected');
   });
-});*/
+});
 
-/* mongoose.connect(
+mongoose.connect(
   config.mongodbUri,
   { useNewUrlParser: true }
 );
@@ -96,5 +96,5 @@ mongoose.set("useCreateIndex", true);
 const db = mongoose.connection;
 db.once('open', () => {
   console.log('DB Connected...');
-}) */
+})
 
