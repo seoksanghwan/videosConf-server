@@ -10,15 +10,13 @@ const cors = require('cors');
 const Room = require('./model/RoomList');
 const socketIo = require("socket.io");
 const config = require('./config')
-const port = process.env.PORT || 8000
+const port = process.env.PORT || 8080;
 const app = express()
 const options = {
-  key: fs.readFileSync('./key/file.pem'),
-  cert: fs.readFileSync('./key/file.crt')
+  key: fs.readFileSync('./key/key.pem'),
+  cert: fs.readFileSync('./key/cert.pem')
 };
-const port1 = process.env.PORT || 8000;
-const port2 = process.env.PORT || 8080;
-//
+
 app.use(express.urlencoded());
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
@@ -27,22 +25,14 @@ app.use(morgan('dev'))
 app.use('/', router);
 app.set('json spaces', 2);
 app.set('jwt-secret', config.secret)
-
 app.use('/api', require('./routes/api'))
 
-var server = https.createServer(options, app).listen(port2, function(){  
-  console.log("Https server listening on port " + port2);
+var server = app.listen(port, function(){  
+  console.log("Https server listening on port " + port);
 });
 
-app.get('/', function (req, res) {  
-  res.writeHead(200, {'Content-Type' : 'text/html'});
-  res.write('<h3>Welcome</h3>');
-  res.write('<a href="/login">Please login</a>');
-  res.end();
-});
-
-const io = socketIo(server);
-io.of('/').on('connection', (socket) => {
+//const io = socketIo(server);
+/*io.on('connection', (socket) => {
   console.log({'a user connected' : socket.id});
   var room = Room.find((err, data) => {
     if (err) {
@@ -89,7 +79,7 @@ io.of('/').on('connection', (socket) => {
     console.log("나감요." + socket.id)
     io.emit('user disconnected');
   });
-});
+});*/
 
 mongoose.connect(
   config.mongodbUri,
@@ -100,3 +90,10 @@ const db = mongoose.connection;
 db.once('open', () => {
   console.log('DB Connected...');
 })
+
+app.get('/', function (req, res) {  
+  res.writeHead(200, {'Content-Type' : 'text/html'});
+  res.write('<h3>Welcome</h3>');
+  res.write('<a href="/login">Please login</a>');
+  res.end();
+});
