@@ -10,7 +10,7 @@ const cors = require('cors');
 const Room = require('./model/RoomList');
 const socketIo = require("socket.io");
 const config = require('./config')
-const port = process.env.PORT || 8080;
+const port = process.env.PORT;
 const app = express()
 const options = {
   key: fs.readFileSync('./key/key.pem'),
@@ -27,8 +27,15 @@ app.set('json spaces', 2);
 app.set('jwt-secret', config.secret)
 app.use('/api', require('./routes/api'))
 
-var server = app.listen(port, function(){  
+app.listen(port, function(){  
   console.log("Https server listening on port " + port);
+});
+
+app.get('/', function (req, res) {  
+  res.writeHead(200, {'Content-Type' : 'text/html'});
+  res.write('<h3>Welcome</h3>');
+  res.write('<a href="/login">Please login</a>');
+  res.end();
 });
 
 //const io = socketIo(server);
@@ -81,7 +88,7 @@ var server = app.listen(port, function(){
   });
 });*/
 
-mongoose.connect(
+/* mongoose.connect(
   config.mongodbUri,
   { useNewUrlParser: true }
 );
@@ -89,11 +96,5 @@ mongoose.set("useCreateIndex", true);
 const db = mongoose.connection;
 db.once('open', () => {
   console.log('DB Connected...');
-})
+}) */
 
-app.get('/', function (req, res) {  
-  res.writeHead(200, {'Content-Type' : 'text/html'});
-  res.write('<h3>Welcome</h3>');
-  res.write('<a href="/login">Please login</a>');
-  res.end();
-});
