@@ -9,9 +9,11 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const Room = require('./model/RoomList');
 const socketIo = require("socket.io");
-const config = require('./config')
+const config = require('./config');
 const port = process.env.PORT;
-const app = express()
+const app = express();
+const pbkdf2Password = require('pbkdf2-password');
+const hasher = pbkdf2Password();
 const options = {
   key: fs.readFileSync('./key/key.pem'),
   cert: fs.readFileSync('./key/cert.pem')
@@ -31,11 +33,26 @@ const server = app.listen(port, function(){
   console.log("Https server listening on port " + port);
 });
 
-app.get('/', function (req, res) {  
+app.get('/', (req, res) => {  
   res.writeHead(200, {'Content-Type' : 'text/html'});
   res.write('<h3>Welcome</h3>');
-  res.write('<a href="/login">Please login</a>');
   res.end();
+});
+
+app.post('/passcheck',(req, res) => { 
+  console.log(req.body)
+  const { roomid } = req.body
+  Room.findOne({_id: roomid}, function (err, room) {
+    if(err) {return res.status(500).send({error: 'database find failure'});}
+    const { password } = req.body
+    hasher({ password, salt:room.userSalt }, function (err, pass, salt, hash) {
+        if(hash === room.roomPassword){
+          res.json({ message : true });
+        }else{
+          res.json({ message : false });
+        }
+    });
+  })
 });
 
 const io = socketIo(server);
@@ -50,24 +67,30 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('addItem', (addData) => {
+  socket.on('addItem', (addData) => {    
     let {
       title,
+      roomPassword,
       userName,
       userMail
     } = addData;
-    const newRoom = new Room({
-      title,
-      userName,
-      userMail
-    });
-    newRoom.save((err, roomsData) => {
-      if (err) {
-        console.log("---Gethyl ADD NEW ITEM failed!! " + err)
-      } else {
-        io.emit('itemAdded', roomsData)
-        console.log({ message: "+++Gethyl ADD NEW ITEM Added!" })
-      }
+    hasher({password: addData.roomPassword}, function (err, pass, salt, hash) {
+      console.log(salt)
+      const newRoom = new Room({
+        title,
+        roomPassword : hash,
+        userName,
+        userMail,
+        userSalt : salt
+      });
+      newRoom.save((err, roomsData) => {
+        if (err) {
+          console.log("---Gethyl ADD NEW ITEM failed!! " + err)
+        } else {
+          io.emit('itemAdded', roomsData)
+          console.log({ message: "+++Gethyl ADD NEW ITEM Added!" })
+        }
+      });
     });
   })
 

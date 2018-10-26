@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "axios": "^0.18.0",
-    "baucis": "^1.6.8",
+    "bcrypt": "1.0.3",
     "body-parser": "^1.18.3",
     "cors": "^2.8.4",
     "express": "^4.16.3",
@@ -15,19 +15,19 @@
     "jsonwebtoken": "^8.3.0",
     "mongoose": "^5.2.18",
     "morgan": "^1.9.1",
-    "pm2": "^3.2.2",
+    "pbkdf2-password": "^1.2.1",
     "socket.io": "^2.1.1"
   },
   "scripts": {
     "dev": "SET NODE_ENV=development DB_PASSWORD=admin5678 && nodemon ./bin/www",
-    "start": "node app.js"
+    "start": "nodemon app.js"
   },
   "devDependencies": {
     "nodemon": "^1.18.4"
   },
-  "engines" : {
-    "node" : "8.11.2",
-    "npm" : "5.6.0",
-    "yarn" : "1.10.1"
+  "engines": {
+    "node": "8.11.2",
+    "npm": "5.6.0",
+    "yarn": "1.10.1"
   }
 }

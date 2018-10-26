@@ -13,6 +13,14 @@ const roomSchema = new Schema({
   userMail:  {
     type : String,
     required: true
+  },
+  roomPassword:  {
+    type : String,
+    required: true
+  },
+  userSalt: {
+    type : String,
+    required: true
   }
 })
 
