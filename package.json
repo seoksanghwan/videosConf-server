@@ -20,7 +20,7 @@
   },
   "scripts": {
     "dev": "SET NODE_ENV=development DB_PASSWORD=admin5678 && nodemon ./bin/www",
-    "start": "nodemon app.js"
+    "start": "node app.js"
   },
   "devDependencies": {
     "nodemon": "^1.18.4"
