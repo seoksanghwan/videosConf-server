@@ -20,14 +20,14 @@ const options = {
 };
 
 app.use(express.urlencoded());
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.use(cors());
-app.use(morgan('dev'))
+app.use(morgan('dev'));
 app.use('/', router);
 app.set('json spaces', 2);
-app.set('jwt-secret', config.secret)
-app.use('/api', require('./routes/api'))
+app.set('jwt-secret', config.secret);
+app.use('/api', require('./routes/api'));
 
 const server = app.listen(port, function(){  
   console.log("Https server listening on port " + port);
@@ -40,11 +40,10 @@ app.get('/', (req, res) => {
 });
 
 app.post('/passcheck',(req, res) => { 
-  console.log(req.body)
-  const { roomid } = req.body
+  const { roomid } = req.body;
   Room.findOne({_id: roomid}, function (err, room) {
     if(err) {return res.status(500).send({error: 'database find failure'});}
-    const { password } = req.body
+    const { password } = req.body;
     hasher({ password, salt:room.userSalt }, function (err, pass, salt, hash) {
         if(hash === room.roomPassword){
           res.json({ message : true });
@@ -52,7 +51,7 @@ app.post('/passcheck',(req, res) => {
           res.json({ message : false });
         }
     });
-  })
+  });
 });
 
 const io = socketIo(server);
@@ -60,10 +59,10 @@ io.on('connection', (socket) => {
   console.log({'a user connected' : socket.id});
   var room = Room.find((err, data) => {
     if (err) {
-      console.log("---Gethyl GET failed!!")
+      console.log("---Gethyl GET failed!!");
     } else {
       socket.emit('initialList', data);
-      console.log("데이터를 가져왔습니다.")
+      console.log("데이터를 가져왔습니다.");
     }
   });
 
@@ -75,7 +74,6 @@ io.on('connection', (socket) => {
       userMail
     } = addData;
     hasher({password: addData.roomPassword}, function (err, pass, salt, hash) {
-      console.log(salt)
       const newRoom = new Room({
         title,
         roomPassword : hash,
@@ -97,16 +95,16 @@ io.on('connection', (socket) => {
   socket.on('removeItem', (id) => {
     Room.findOneAndDelete({ _id: id }, function (err) {
       if (err) {
-        console.log("---Gethyl ADD NEW ITEM failed!! " + err)
+        console.log("---Gethyl ADD NEW ITEM failed!! " + err);
       } else {
         io.emit('itemRemove', id);
-        console.log({ message: "+++Gethyl ADD NEW ITEM Removed!!" })
+        console.log({ message: "+++Gethyl ADD NEW ITEM Removed!!" });
       }
-    })
+    });
   });
 
   socket.on('disconnect', () => {
-    console.log("나감요." + socket.id)
+    console.log("나감요." + socket.id);
     io.emit('user disconnected');
   });
 });
