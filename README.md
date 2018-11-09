@@ -16,14 +16,14 @@ Videos는 연결된 웹켐으로 채널을 생성하여 간편하게 여러명�
 
 ## Installation
 ```
-git clone https://github.com/seoksanghwan/videosConf-client.git
+git clone https://github.com/seoksanghwan/videosConf-server.git
 npm
 npm install
-npm start
+npm nodestart
 
 yarn
 yarn install
-yarn start
+yarn nodestart
 ```
 
 ## Feature
