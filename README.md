@@ -2,6 +2,8 @@
 
 ![videosConf-sever](./ReadmeImg/conf.gif)
 
+[YouTube 데모](https://youtu.be/7AIV9IS0oKw)
+
 ## Introduction
 Videos는 연결된 웹켐으로 채널을 생성하여 간편하게 여러명과 동시에 화상채팅을 할 수 있는 서비스입니다. 
 
