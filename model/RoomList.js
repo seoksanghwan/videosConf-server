@@ -21,7 +21,8 @@ const roomSchema = new Schema({
   userSalt: {
     type : String,
     required: true
-  }
+  },
+  realpeer: Number
 })
 
 var Room = mongoose.model('rooms', roomSchema);

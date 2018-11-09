@@ -1,54 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../../../model/user');
 
-exports.register = (req, res) => {
-  const { username, password } = req.body;
-  let newUser = null;
-  const create = (user) => {
-    if (user) {
-      throw new Error('username exists')
-    } else {
-      return User.create(username, password)
-    }
-  };
-
-  const count = (user) => {
-    newUser = user
-    return User.count({}).exec()
-  };
-
-  const assign = (count) => {
-    if (count === 1) {
-      return newUser.assignAdmin()
-    } else {
-      return Promise.resolve(false)
-    }
-  }
-
-  // respond to the client
-  const respond = (isAdmin) => {
-    res.json({
-      message: 'registered successfully',
-      admin: isAdmin ? true : false
-    })
-  }
-
-  // run when there is an error (username exists)
-  const onError = (error) => {
-    res.status(409).json({
-      message: error.message
-    })
-  }
-
-  // check username duplication
-  User.findOneByUsername(username)
-    .then(create)
-    .then(count)
-    .then(assign)
-    .then(respond)
-    .catch(onError)
-}
-
 exports.login = (req, res, next) => {
   const JWT_SECRET = req.app.get('jwt-secret');
   User.findOne({ uid: req.body.uid }).then(result => {

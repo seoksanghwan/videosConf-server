@@ -10,7 +10,7 @@ const cors = require('cors');
 const Room = require('./model/RoomList');
 const socketIo = require("socket.io");
 const config = require('./config');
-const port = process.env.PORT;
+const port = process.env.PORT||8080;
 const app = express();
 const pbkdf2Password = require('pbkdf2-password');
 const hasher = pbkdf2Password();
@@ -62,16 +62,18 @@ io.on('connection', (socket) => {
       console.log("---Gethyl GET failed!!");
     } else {
       socket.emit('initialList', data);
+      
       console.log("데이터를 가져왔습니다.");
     }
   });
 
-  socket.on('addItem', (addData) => {    
+  socket.on('addItem', (addData) => {  
     let {
       title,
       roomPassword,
       userName,
-      userMail
+      userMail,
+      realpeer 
     } = addData;
     hasher({password: addData.roomPassword}, function (err, pass, salt, hash) {
       const newRoom = new Room({
@@ -79,7 +81,8 @@ io.on('connection', (socket) => {
         roomPassword : hash,
         userName,
         userMail,
-        userSalt : salt
+        userSalt : salt,
+        realpeer : realpeer || 0
       });
       newRoom.save((err, roomsData) => {
         if (err) {
@@ -104,7 +107,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log("나감요." + socket.id);
+    console.log(socket.id);
     io.emit('user disconnected');
   });
 });
