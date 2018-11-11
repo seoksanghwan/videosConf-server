@@ -73,6 +73,10 @@ yarn nodestart
 - socket.io
 - Heroku를 통한 배포
 
+## Test
+
+- Jest와 Enzyme를 이용하여 Reducer 단위 테스트 구현
+
 ## Deployment
 - client는 netlify를 이용하여 github repository를 배포하였습니다.
 - server는 heroku를 이용하여 배포 하였습니다.
