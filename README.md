@@ -75,7 +75,7 @@ yarn nodestart
 
 ## Test
 
-- Jest와 Enzyme를 이용하여 Reducer 단위 테스트 구현
+- Jest와 Enzyme를 이용하여 Reducer 및 Component 단위 테스트 구현
 
 ## Deployment
 - client는 netlify를 이용하여 github repository를 배포하였습니다.
