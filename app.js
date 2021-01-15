@@ -60,7 +60,7 @@ app.post('/passcheck', (req, res) => {
   });
 });
 
-const io = socketIo(server);
+const io = socketIo(server, { origins: '*:*'});
 io.on('connection', (socket) => {
   console.log({ 'a user connected': socket.id });
   var room = Room.find((err, data) => {
