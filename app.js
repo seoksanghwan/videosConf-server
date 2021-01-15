@@ -19,17 +19,12 @@ const options = {
   cert: fs.readFileSync('./key/cert.pem')
 };
 
-var corsOptionsDelegate = function (req, callback) {
-  var corsOptions;
-  if (allowlist.indexOf(req.header('Origin')) !== -1) {
-    corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
-  } else {
-    corsOptions = { origin: false } // disable CORS for this request
-  }
-  callback(null, corsOptions) // callback expects two parameters: error and options
-}
+const corsOptions = {
+  origin: 'https://www.videos-conf.com', // 허락하고자 하는 요청 주소
+  credentials: true, // true로 하면 설정한 내용을 response 헤더에 추가 해줍니다.
+};
 
-// app.use();
+app.use(cors(corsOptions));
 app.use(express.urlencoded());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -44,10 +39,8 @@ const server = app.listen(port, function () {
   console.log("Https server listening on port " + port);
 });
 
-app.get('/',  cors(corsOptionsDelegate), (req, res) => {
-  res.writeHead(200, { 
-    'Content-Type': 'text/html'
-  });
+app.get('/', (req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/html' });
   res.write('<h3>Welcome</h3>');
   res.end();
 });
@@ -68,7 +61,6 @@ app.post('/passcheck', (req, res) => {
 });
 
 const io = socketIo(server);
-
 io.on('connection', (socket) => {
   console.log({ 'a user connected': socket.id });
   var room = Room.find((err, data) => {
