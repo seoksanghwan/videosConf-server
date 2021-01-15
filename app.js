@@ -29,7 +29,7 @@ var corsOptionsDelegate = function (req, callback) {
   callback(null, corsOptions) // callback expects two parameters: error and options
 }
 
-app.use(cors(corsOptionsDelegate));
+// app.use();
 app.use(express.urlencoded());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -44,10 +44,9 @@ const server = app.listen(port, function () {
   console.log("Https server listening on port " + port);
 });
 
-app.get('/', (req, res) => {
+app.get('/',  cors(corsOptionsDelegate), (req, res) => {
   res.writeHead(200, { 
-    'Content-Type': 'text/html',
-    'Access-Control-Allow-Origin': '*'
+    'Content-Type': 'text/html'
   });
   res.write('<h3>Welcome</h3>');
   res.end();
@@ -69,6 +68,7 @@ app.post('/passcheck', (req, res) => {
 });
 
 const io = socketIo(server);
+
 io.on('connection', (socket) => {
   console.log({ 'a user connected': socket.id });
   var room = Room.find((err, data) => {
