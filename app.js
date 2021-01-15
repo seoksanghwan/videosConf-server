@@ -28,15 +28,7 @@ app.use(cors(corsOptions));
 app.use(express.urlencoded());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
 app.use(morgan('dev'));
-app.use(function (req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    next();
-});
 app.use('/', router);
 app.set('json spaces', 2);
 app.set('jwt-secret', config.secret);
@@ -48,7 +40,10 @@ const server = app.listen(port, function () {
 });
 
 app.get('/', (req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/html' });
+  res.writeHead(200, { 
+    'Content-Type': 'text/html',
+    'Access-Control-Allow-Origin': '*' 
+  });
   res.write('<h3>Welcome</h3>');
   res.end();
 });
