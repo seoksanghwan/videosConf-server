@@ -28,14 +28,6 @@ app.use('/', router);
 app.set('json spaces', 2);
 app.set('jwt-secret', config.secret);
 app.use('/api', require('./routes/api'));
-// Add headers
-app.use(function (req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    next();
-});
 
 
 const server = app.listen(port, function () {
